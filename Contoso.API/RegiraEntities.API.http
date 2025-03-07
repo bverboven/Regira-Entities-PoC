@@ -1,0 +1,6 @@
+@RegiraEntities.API_HostAddress = http://localhost:5205
+
+GET {{RegiraEntities.API_HostAddress}}/swagger/index.html
+Accept: application/json
+
+###
