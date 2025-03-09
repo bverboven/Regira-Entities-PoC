@@ -21,6 +21,3 @@ Sample GET urls:
 ## Dependencies
 
 - [Regira Entities](https://github.com/bverboven/Regira-Codebase/tree/master/src/Common.Entities/README.md)
-- [EF core](https://github.com/bverboven/Regira-Codebase/tree/master/src/Entities.EFcore)
-- [API](https://github.com/bverboven/Regira-Codebase/tree/master/src/Entities.Web)
-- [Dependency Injection](https://github.com/bverboven/Regira-Codebase/tree/master/src/Entities.DependencyInjection)

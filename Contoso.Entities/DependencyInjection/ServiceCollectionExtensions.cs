@@ -1,4 +1,5 @@
-﻿using Contoso.Data;
+﻿using Contoso.Constants;
+using Contoso.Data;
 using Contoso.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -39,27 +40,12 @@ public static class ServiceCollectionExtensions
                 e.AddDefaultGlobalQueryFilters<Guid>();
                 e.AddPrimer<HasGuidKeyPrimer>();
             })
-            .WithAttachments(_ =>
-            {
-                var dir = new DirectoryInfo(Path.Combine(AppContext.BaseDirectory, "../../../../data")).FullName;
-                return new BinaryFileService(new FileSystemOptions { RootFolder = Path.Combine(dir, "data") });
-            })
-            //.AddSimpleEntities()
-            .AddEntities()
-            ;
+            .WithAttachments(_ => new BinaryFileService(new FileSystemOptions { RootFolder = AppSettings.DataFolder }))
+            .AddEntities();
 
         return services;
     }
 
-    public static IEntityServiceCollection<ContosoContext> AddSimpleEntities(this IEntityServiceCollection<ContosoContext> services)
-    {
-        return services
-            .For<Person>()
-            .For<Student>()
-            .For<Instructor>(e => e.HasAttachments(item => item.Attachments))
-            .For<Department, Guid>()
-            .For<Course, int, CourseSearchObject, CourseSortBy, CourseIncludes>(e => e.HasAttachments(item => item.Attachments));
-    }
     public static IEntityServiceCollection<ContosoContext> AddEntities(this IEntityServiceCollection<ContosoContext> services)
     {
         return services
@@ -112,13 +98,42 @@ public static class ServiceCollectionExtensions
                     return query;
                 });
             })
-            .For<Course, int, CourseSearchObject, CourseSortBy, CourseIncludes>(course =>
+            .For<Course, CourseSearchObject, CourseSortBy, CourseIncludes>(course =>
             {
                 course.Filter((query, so) =>
                 {
+                    // DepartmentId
+                    if (so?.DepartmentId?.Any() == true)
+                    {
+                        query = query.Where(x => so.DepartmentId.Contains(x.DepartmentId));
+                    }
+                    // InstructorId
+                    if (so?.InstructorId?.Any() == true)
+                    {
+                        query = query.Where(x => x.Instructors!.Any(instructor => so.InstructorId.Contains(instructor.Id)));
+                    }
+                    // Title
                     if (!string.IsNullOrWhiteSpace(so?.Q))
                     {
-                        query = query.Where(x => x.Title!.Contains(so.Q));
+                        query = query.Where(x => EF.Functions.Like(x.Title, $"%{so.Q}%"));
+                    }
+                    // Credits
+                    if (so?.MinCredits.HasValue == true)
+                    {
+                        query = query.Where(x => x.Credits >= so.MinCredits);
+                    }
+                    if (so?.MaxCredits.HasValue == true)
+                    {
+                        query = query.Where(x => x.Credits <= so.MaxCredits);
+                    }
+                    // EnrollmentDate
+                    if (so?.MinEnrollmentDate.HasValue == true)
+                    {
+                        query = query.Where(x => x.Enrollments!.Any(e => e.StartDate >= so.MinEnrollmentDate));
+                    }
+                    if (so?.MaxEnrollmentDate.HasValue == true)
+                    {
+                        query = query.Where(x => x.Enrollments!.Any(e => e.StartDate < so.MaxEnrollmentDate.Value.Date.AddDays(1)));
                     }
                     return query;
                 });
@@ -140,16 +155,23 @@ public static class ServiceCollectionExtensions
                 });
                 course.Includes((query, incl) =>
                 {
-                    if (incl?.HasFlag(CourseIncludes.Instructors) == true)
+                    if (incl == null)
+                    {
+                        return query;
+                    }
+
+                    if (incl.Value.HasFlag(CourseIncludes.Instructors))
                     {
                         query = query.Include(x => x.Instructors);
                     }
-                    if (incl?.HasFlag(CourseIncludes.Enrollments) == true)
+                    if (incl.Value.HasFlag(CourseIncludes.Enrollments) || incl.Value.HasFlag(CourseIncludes.Students))
                     {
-                        query = query.Include(x => x.Enrollments!)
-                            .ThenInclude(x => x.Student);
+                        query = incl.Value.HasFlag(CourseIncludes.Students)
+                            ? query.Include(x => x.Enrollments!)
+                                .ThenInclude(x => x.Student)
+                            : query.Include(x => x.Enrollments);
                     }
-                    if (incl?.HasFlag(CourseIncludes.Attachments) == true)
+                    if (incl.Value.HasFlag(CourseIncludes.Attachments))
                     {
                         query = query.Include(x => x.Attachments!)
                             .ThenInclude(x => x.Attachment);

@@ -1,10 +1,11 @@
-﻿using Contoso.Data;
+﻿using Contoso.Console;
+using Contoso.Constants;
+using Contoso.Data;
 using Contoso.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Contoso.Console;
 
 // prevent date errors in Postgres
 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
@@ -19,15 +20,14 @@ var builder = new HostBuilder()
     .ConfigureServices(services =>
     {
         services.AddContosoEntities(dbOptionsBuilder =>
-        {
-            var dir = new DirectoryInfo(Path.Combine(AppContext.BaseDirectory, "../../../../data")).FullName;
-            Console.WriteLine($"Installing at {dir}");
-            Directory.CreateDirectory(dir);
-            dbOptionsBuilder
-                .UseSqlite($"DataSource={dir}\\contoso.db", sqliteBuilder => sqliteBuilder.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery))
-                .EnableDetailedErrors()
-                .EnableSensitiveDataLogging();
-        })
+            {
+                Console.WriteLine($"Installing at {AppSettings.DataFolder}");
+                Directory.CreateDirectory(AppSettings.DataFolder);
+                dbOptionsBuilder
+                    .UseSqlite(AppSettings.ConnectionString, sqliteBuilder => sqliteBuilder.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery))
+                    .EnableDetailedErrors()
+                    .EnableSensitiveDataLogging();
+            })
         .AddTransient<DataSeeder>();
     });
 
@@ -42,7 +42,7 @@ if (await db.Database.EnsureCreatedAsync())
     Console.WriteLine("Database created");
 }
 var seeder = sp.GetRequiredService<DataSeeder>();
-await seeder.SeedDataAsync(100);
+await seeder.SeedDataAsync(1);
 
 Console.WriteLine("The End");
 

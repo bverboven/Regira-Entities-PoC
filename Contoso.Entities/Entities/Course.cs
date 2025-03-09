@@ -51,8 +51,9 @@ public enum CourseSortBy
 public enum CourseIncludes
 {
     None = 0,
-    Enrollments = 1 << 0,
-    Instructors = 1 << 1,
-    Attachments = 1 << 2,
+    Instructors = 1 << 0,
+    Enrollments = 1 << 1,
+    Students = 1 << 2,
+    Attachments = 1 << 3,
     All = Enrollments | Instructors | Attachments
 }

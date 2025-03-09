@@ -1,4 +1,5 @@
-﻿using Contoso.DependencyInjection;
+﻿using Contoso.Constants;
+using Contoso.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
 
 namespace Contoso.API.Infrastructure;
@@ -25,9 +26,8 @@ public static class HostingExtensions
 
         services.AddContosoEntities(dbOptionsBuilder =>
         {
-            var dir = new DirectoryInfo(Path.Combine(".\\", "../data")).FullName;
             dbOptionsBuilder
-                .UseSqlite($"DataSource={dir}\\contoso.db", sqliteBuilder => sqliteBuilder.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery))
+                .UseSqlite(AppSettings.ConnectionString, sqliteBuilder => sqliteBuilder.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery))
                 .EnableDetailedErrors()
                 .EnableSensitiveDataLogging();
         });
