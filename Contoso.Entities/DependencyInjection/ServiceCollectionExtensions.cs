@@ -6,7 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Regira.DAL.EFcore.Services;
 using Regira.Entities.DependencyInjection.Attachments;
 using Regira.Entities.DependencyInjection.Mapping;
-using Regira.Entities.DependencyInjection.Primers;
+using Regira.Entities.DependencyInjection.Preppers;
 using Regira.Entities.DependencyInjection.QueryBuilders;
 using Regira.Entities.DependencyInjection.ServiceBuilders.Abstractions;
 using Regira.Entities.DependencyInjection.ServiceBuilders.Extensions;
@@ -38,7 +38,8 @@ public static class ServiceCollectionExtensions
                 e.ConfigureDefaultJsonOptions();
 
                 e.AddDefaultGlobalQueryFilters<Guid>();
-                e.AddPrimer<HasGuidKeyPrimer>();
+                //e.AddPrimer<HasGuidKeyPrimer>();
+                e.AddPrepper<HasGuidPrepper>();
             })
             .WithAttachments(_ => new BinaryFileService(new FileSystemOptions { RootFolder = AppSettings.DataFolder }))
             .AddEntities();
@@ -49,9 +50,10 @@ public static class ServiceCollectionExtensions
     public static IEntityServiceCollection<ContosoContext> AddEntities(this IEntityServiceCollection<ContosoContext> services)
     {
         return services
-            .For<Person>()
+            .For<Person>(p => p.AddMapping<PersonDto, PersonInputDto>())
             .For<Student>(student =>
             {
+                student.AddMapping<StudentDto, StudentInputDto>();
                 student.SortBy(query => query
                     .OrderBy(x => x.GivenName)
                     .ThenBy(x => x.LastName)
@@ -69,6 +71,7 @@ public static class ServiceCollectionExtensions
             })
             .For<Instructor>(instructor =>
             {
+                instructor.AddMapping<InstructorDto, InstructorInputDto>();
                 instructor.SortBy(query => query
                     .OrderBy(x => x.LastName)
                     .ThenBy(x => x.GivenName)
@@ -77,16 +80,21 @@ public static class ServiceCollectionExtensions
                 {
                     if (incl?.HasFlag(EntityIncludes.All) == true)
                     {
+                        query = query.Include(x => x.Courses!).ThenInclude(x => x.Course);
                         query = query.Include(x => x.OfficeAssignments);
                         query = query.Include(x => x.Attachments!)
                             .ThenInclude(x => x.Attachment);
                     }
                     return query;
                 });
-                instructor.HasAttachments(e => e.Attachments);
+                instructor.HasAttachments(e => e.Attachments, a =>
+                {
+                    a.AddMapping<InstructorAttachmentDto, InstructorAttachmentInputDto>();
+                });
             })
             .For<Department, Guid>(dep =>
             {
+                dep.AddMapping<DepartmentDto, DepartmentInputDto>();
                 dep.SortBy(query => query.OrderBy(x => x.Title));
                 dep.Includes((query, incl) =>
                 {
@@ -100,6 +108,7 @@ public static class ServiceCollectionExtensions
             })
             .For<Course, CourseSearchObject, CourseSortBy, CourseIncludes>(course =>
             {
+                course.AddMappingProfile<CourseProfile>();
                 course.Filter((query, so) =>
                 {
                     // DepartmentId
@@ -160,9 +169,13 @@ public static class ServiceCollectionExtensions
                         return query;
                     }
 
+                    if (incl.Value.HasFlag(CourseIncludes.Department))
+                    {
+                        query = query.Include(x => x.Department);
+                    }
                     if (incl.Value.HasFlag(CourseIncludes.Instructors))
                     {
-                        query = query.Include(x => x.Instructors);
+                        query = query.Include(x => x.Instructors!).ThenInclude(x => x.Instructor);
                     }
                     if (incl.Value.HasFlag(CourseIncludes.Enrollments) || incl.Value.HasFlag(CourseIncludes.Students))
                     {
@@ -178,6 +191,8 @@ public static class ServiceCollectionExtensions
                     }
                     return query;
                 });
+                course.Related(e => e.Enrollments);
+                course.Related(e => e.Instructors);
                 course.HasAttachments(e => e.Attachments);
             });
     }

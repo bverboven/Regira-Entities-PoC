@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Regira.Entities.EFcore.Preppers.Abstractions;
 using Regira.Entities.EFcore.Primers.Abstractions;
 using Regira.Entities.Models.Abstractions;
 
@@ -10,7 +11,20 @@ internal class HasGuidKeyPrimer : EntityPrimerBase<IEntity<Guid>>
     {
         if (entity.Id == Guid.Empty)
         {
-            entity.Id = Guid.NewGuid();
+            entity.Id = Guid.CreateVersion7();
+        }
+
+        return Task.CompletedTask;
+    }
+}
+
+internal class HasGuidPrepper : EntityPrepperBase<IEntity<Guid>>
+{
+    public override Task Prepare(IEntity<Guid> modified, IEntity<Guid>? original)
+    {
+        if (modified.Id == Guid.Empty)
+        {
+            modified.Id = Guid.CreateVersion7();
         }
 
         return Task.CompletedTask;

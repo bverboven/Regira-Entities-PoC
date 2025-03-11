@@ -23,7 +23,7 @@ public class InstructorAttachmentController : EntityAttachmentControllerBase<Ins
 
 // Course
 [Route("courses")]
-public class CourseController : EntityControllerBase<Course, int, CourseSearchObject, CourseSortBy, CourseIncludes, Course, Course>;
+public class CourseController : EntityControllerBase<Course, int, CourseSearchObject, CourseSortBy, CourseIncludes, CourseDto, CourseInputDto>;
 [Route("courses")]
 public class CourseAttachmentController : EntityAttachmentControllerBase<CourseAttachment>;
 

@@ -1,10 +1,10 @@
-﻿using System.Text;
-using Bogus;
+﻿using Bogus;
 using Contoso.Constants;
 using Contoso.Data;
 using Contoso.Entities;
 using Regira.Entities.Abstractions;
 using Regira.Entities.Attachments.Models;
+using System.Text;
 using Person = Contoso.Entities.Person;
 
 namespace Contoso.Console;
@@ -51,8 +51,21 @@ public class DataSeeder(ContosoContext dbContext, IEntityService<Person> personS
         }
         foreach (var item in courses)
         {
-            item.Instructors = faker.PickRandom(instructors, faker.Random.Number(0, 3)).ToList();
-            item.Department = departments.FirstOrDefault(d => item.Instructors.Any(i => i.Id == d.InstructorId));
+            var department = faker.PickRandom(departments);
+            item.DepartmentId = department.Id;
+            item.Instructors = faker.PickRandom(instructors, faker.Random.Number(0, 2)).Concat([department.Administrator!])
+                .Select(instructor =>
+                {
+                    var start = faker.Date.Between(DateTime.Now.AddYears(-1), DateTime.Now);
+                    return new CourseInstructor
+                    {
+                        Instructor = instructor,
+                        Course = item,
+                        StartDate = start,
+                        EndDate = start.AddMonths(faker.Random.Int(1, 18))
+                    };
+                })
+                .ToList();
             await courseService.Add(item);
         }
 
@@ -124,7 +137,7 @@ public class DataSeeder(ContosoContext dbContext, IEntityService<Person> personS
     {
         return new Faker<Course>()
             .RuleFor(x => x.Title, (f) => f.Commerce.ProductName())
-            .RuleFor(x => x.Credits, (f) => f.Random.Number(0, 100).OrNull(f, .2f))
+            .RuleFor(x => x.Credits, (f) => f.Random.Number(0, 5).OrNull(f, .2f))
             .Generate(count);
     }
     public IList<Department> SeedDepartments(int count)
