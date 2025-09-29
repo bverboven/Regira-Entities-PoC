@@ -1,6 +1,6 @@
 using Regira.Entities.Attachments.Abstractions;
 using Regira.Entities.Attachments.Models;
-using Regira.Entities.Web.Attachments.Models;
+using Regira.Entities.Mapping.Models;
 using System.ComponentModel.DataAnnotations;
 
 namespace Contoso.Entities;

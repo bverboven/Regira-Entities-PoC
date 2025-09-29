@@ -5,12 +5,13 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Regira.DAL.EFcore.Services;
 using Regira.Entities.DependencyInjection.Attachments;
-using Regira.Entities.DependencyInjection.Mapping;
+using Regira.Entities.DependencyInjection.Json;
 using Regira.Entities.DependencyInjection.Preppers;
 using Regira.Entities.DependencyInjection.QueryBuilders;
 using Regira.Entities.DependencyInjection.ServiceBuilders.Abstractions;
 using Regira.Entities.DependencyInjection.ServiceBuilders.Extensions;
 using Regira.Entities.EFcore.Primers;
+using Regira.Entities.Mapping.AutoMapper;
 using Regira.Entities.Models;
 using Regira.IO.Storage.FileSystem;
 
@@ -34,8 +35,8 @@ public static class ServiceCollectionExtensions
             .UseEntities<ContosoContext>(e =>
             {
                 e.UseDefaults();
-                e.UseAutoMapper();
                 e.ConfigureDefaultJsonOptions();
+                e.UseAutoMapper();
 
                 e.AddDefaultGlobalQueryFilters<Guid>();
                 //e.AddPrimer<HasGuidKeyPrimer>();
@@ -50,7 +51,10 @@ public static class ServiceCollectionExtensions
     public static IEntityServiceCollection<ContosoContext> AddEntities(this IEntityServiceCollection<ContosoContext> services)
     {
         return services
-            .For<Person>(p => p.AddMapping<PersonDto, PersonInputDto>())
+            .For<Person>(p =>
+            {
+                p.AddMapping<PersonDto, PersonInputDto>();
+            })
             .For<Student>(student =>
             {
                 student.AddMapping<StudentDto, StudentInputDto>();
@@ -108,7 +112,7 @@ public static class ServiceCollectionExtensions
             })
             .For<Course, CourseSearchObject, CourseSortBy, CourseIncludes>(course =>
             {
-                course.AddMappingProfile<CourseProfile>();
+                course.AddMapping<CourseDto, CourseInputDto>();
                 course.Filter((query, so) =>
                 {
                     // DepartmentId
@@ -154,6 +158,10 @@ public static class ServiceCollectionExtensions
                             return query.OrderByDescending(x => x.Id);
                         case CourseSortBy.Title:
                             return query.OrderBy(x => x.Title);
+                        case CourseSortBy.TitleDesc:
+                            return query.OrderByDescending(x => x.Title);
+                        case CourseSortBy.Department:
+                            return query.OrderBy(x => x.Department!.Title);
                         case CourseSortBy.EnrollmentDate:
                             return query.OrderBy(x => x.Enrollments!.Min(e => e.StartDate));
                         case CourseSortBy.EnrollmentDateDesc:

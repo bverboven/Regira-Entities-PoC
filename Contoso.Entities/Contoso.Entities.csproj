@@ -9,7 +9,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Regira.Entities.DependencyInjection" Version="4.6.2" />
+    <ProjectReference Include="..\..\..\Regira\Regira-Codebase\src\Entities.DependencyInjection\Entities.DependencyInjection.csproj" />
+    <ProjectReference Include="..\..\..\Regira\Regira-Codebase\src\Entities.Mapping.AutoMapper\Entities.Mapping.AutoMapper.csproj" />
   </ItemGroup>
 
  </Project>

@@ -1,9 +1,9 @@
 using AutoMapper;
 using Regira.Entities.Attachments.Abstractions;
 using Regira.Entities.Attachments.Models;
+using Regira.Entities.Mapping.Models;
 using Regira.Entities.Models;
 using Regira.Entities.Models.Abstractions;
-using Regira.Entities.Web.Attachments.Models;
 using System.ComponentModel.DataAnnotations;
 
 namespace Contoso.Entities;
@@ -56,6 +56,8 @@ public enum CourseSortBy
     Id,
     IdDesc,
     Title,
+    TitleDesc,
+    Department,
     EnrollmentDate,
     EnrollmentDateDesc,
 }
