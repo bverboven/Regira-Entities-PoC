@@ -1,0 +1,157 @@
+{
+    "cancel": {
+        "en": "Cancel",
+        "nl": "Toch niet",
+        "fr": "Annuler"
+    },
+    "confirm": {
+        "en": "Confirm",
+        "nl": "Bevestig",
+        "fr": "Confirmer"
+    },
+    "contact": {
+        "en": "Contact",
+        "nl": "Contact",
+        "fr": "Contact"
+    },
+    "country": {
+        "en": "Country",
+        "nl": "Land",
+        "fr": "Pays"
+    },
+    "countries": {
+        "en": "Countries",
+        "nl": "Landen",
+        "fr": "Pays"
+    },
+    "date": {
+        "en": "Date",
+        "nl": "Datum",
+        "fr": "Date"
+    },
+    "delete": {
+        "en": "Delete",
+        "nl": "Verwijder",
+        "fr": "Supprimer"
+    },
+    "deleteItem": {
+        "en": "Delete item '{title}'?",
+        "nl": "Verwijder '{title}'?",
+        "fr": "Supprimer l'élément '{title}' ?"
+    },
+    "files": {
+        "en": "Files",
+        "nl": "Bestanden",
+        "fr": "Fichiers"
+    },
+    "filtersAreApplied": {
+        "en": "Filters are applied",
+        "nl": "Filters actief",
+        "fr": "Filtres appliqués"
+    },
+    "form": {
+        "en": "Form",
+        "nl": "Formulier",
+        "fr": "Formulaire"
+    },
+    "keywords": {
+        "en": "keyword(s)",
+        "nl": "zoekwoord(en)",
+        "fr": "Mot(s)-clé"
+    },
+    "labels": {
+        "en": "Labels",
+        "nl": "Labels",
+        "fr": "Étiquettes"
+    },
+    "labelName": {
+        "en": "Label name",
+        "nl": "Label type",
+        "fr": "Type"
+    },
+    "labelValue": {
+        "en": "Label",
+        "nl": "Label",
+        "fr": "Étiquette"
+    },
+    "location": {
+        "en": "Location",
+        "nl": "Plaats",
+        "fr": "Emplacement"
+    },
+    "name": {
+        "en": "Name",
+        "nl": "Naam",
+        "fr": "Nom"
+    },
+    "new": {
+        "en": "New",
+        "nl": "Nieuw",
+        "fr": "Nouveau"
+    },
+    "noItems": {
+        "en": "No items",
+        "nl": "Geen data",
+        "fr": "Aucun élément"
+    },
+    "noResults": {
+        "en": "No items",
+        "nl": "Geen resultaten",
+        "fr": "Aucun résultat"
+    },
+    "notes": {
+        "en": "Notes",
+        "nl": "Nota's",
+        "fr": "Notes"
+    },
+    "overview": {
+        "en": "Overview",
+        "nl": "Overzicht",
+        "fr": "Liste"
+    },
+    "popOut": {
+        "en": "Pop out",
+        "nl": "Nieuw venster",
+        "fr": "Nouv. fenêtre"
+    },
+    "removeItem?": {
+        "en": "Remove item?",
+        "nl": "Item verwijderen?",
+        "fr": "Supprimer l'élément ?"
+    },
+    "reset": {
+        "en": "Reset",
+        "nl": "Opnieuw",
+        "fr": "Réinitialiser"
+    },
+    "restore": {
+        "en": "Restore",
+        "nl": "Herstel",
+        "fr": "Restaurer"
+    },
+    "results": {
+        "en": "results",
+        "nl": "resultaten",
+        "fr": "Résultats"
+    },
+    "save": {
+        "en": "Save",
+        "nl": "Opslaan",
+        "fr": "Enregistrer"
+    },
+    "submit": {
+        "en": "Submit",
+        "nl": "Verstuur",
+        "fr": "Soumettre"
+    },
+    "type": {
+        "en": "Type",
+        "nl": "Type",
+        "fr": "Type"
+    },
+    "welcome": {
+        "en": "Welcome {name}",
+        "nl": "Welkom {name}",
+        "fr": "Bienvenue {name}"
+    }
+}

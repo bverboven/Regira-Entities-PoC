@@ -1,5 +1,6 @@
 using Contoso.Entities;
 using Microsoft.AspNetCore.Mvc;
+using Regira.Entities.Models;
 using Regira.Entities.Web.Attachments.Abstractions;
 using Regira.Entities.Web.Controllers.Abstractions;
 
@@ -7,19 +8,15 @@ namespace Contoso.API.Controllers;
 
 // ApiControllerAttribute is added automatically by EntityControllerBase<TEntity>
 
-// Person
-[Route("persons")]
-public class PersonController : EntityControllerBase<Person>;
-
 // Student
 [Route("students")]
-public class StudentController : EntityControllerBase<Student>;
+public class StudentController : EntityControllerBase<Student, StudentDto, StudentInputDto>;
 
 // Instructor
 [Route("instructors")]
-public class InstructorController : EntityControllerBase<Instructor>;
+public class InstructorController : EntityControllerBase<Instructor, InstructorDto, InstructorInputDto>;
 [Route("instructors")]
-public class InstructorAttachmentController : EntityAttachmentControllerBase<InstructorAttachment>;
+public class InstructorAttachmentController : EntityAttachmentControllerBase<InstructorAttachment, InstructorAttachmentDto, InstructorAttachmentInputDto>;
 
 // Course
 [Route("courses")]
@@ -29,4 +26,4 @@ public class CourseAttachmentController : EntityAttachmentControllerBase<CourseA
 
 // Department
 [Route("departments")]
-public class DepartmentController : EntityControllerBase<Department, Guid>;
+public class DepartmentController : EntityControllerBase<Department, Guid, SearchObject<Guid>, DepartmentDto, DepartmentInputDto>;

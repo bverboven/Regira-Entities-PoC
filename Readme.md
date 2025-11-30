@@ -1,5 +1,18 @@
 # Regira Entities PoC
 
+## Updating
+
+```
+npx npm-check-updates
+npx npm-check-updates -u
+```
+
+## symlinks
+
+```
+mklink /J regira_modules C:\Projects\Regira\Regira-JsLib\src
+```
+
 ## Generate data
 
 Run Contoso.Console app to:

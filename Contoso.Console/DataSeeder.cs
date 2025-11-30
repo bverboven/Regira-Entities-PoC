@@ -2,30 +2,24 @@
 using Contoso.Constants;
 using Contoso.Data;
 using Contoso.Entities;
-using Regira.Entities.Abstractions;
 using Regira.Entities.Attachments.Models;
+using Regira.Entities.Services.Abstractions;
 using System.Text;
-using Person = Contoso.Entities.Person;
 
 namespace Contoso.Console;
 
-public class DataSeeder(ContosoContext dbContext, IEntityService<Person> personService, IEntityService<Instructor> instructorService, IEntityService<InstructorAttachment> instructorAttachmentService,
+public class DataSeeder(ContosoContext dbContext, IEntityService<Instructor> instructorService, IEntityService<InstructorAttachment> instructorAttachmentService,
     IEntityService<Student> studentService, IEntityService<Department, Guid> departmentService, IEntityService<Course, int> courseService, IEntityService<CourseAttachment> courseAttachmentService)
 {
     public async Task SeedDataAsync(int factor = 1)
     {
         var faker = new Faker();
 
-        var persons = SeedPersons(10 * factor);
         var instructors = SeedInstructors(20 * factor);
         var students = SeedStudents(100 * factor);
         var courses = SeedCourses(25 * factor);
         var departments = SeedDepartments(5 * factor);
 
-        foreach (var item in persons)
-        {
-            await personService.Add(item);
-        }
         foreach (var item in instructors)
         {
             item.OfficeAssignments = new Faker<OfficeAssignment>()
@@ -112,13 +106,6 @@ public class DataSeeder(ContosoContext dbContext, IEntityService<Person> personS
             .Generate(count);
     }
 
-    public IList<Person> SeedPersons(int count)
-    {
-        return new Faker<Person>()
-            .RuleFor(x => x.GivenName, (f) => f.Name.FirstName())
-            .RuleFor(x => x.LastName, (f) => f.Name.LastName())
-            .Generate(count);
-    }
     public IList<Instructor> SeedInstructors(int count)
     {
         return new Faker<Instructor>()
@@ -142,9 +129,14 @@ public class DataSeeder(ContosoContext dbContext, IEntityService<Person> personS
     }
     public IList<Department> SeedDepartments(int count)
     {
-        return new Faker<Department>()
-            .RuleFor(x => x.Title, (f) => f.Commerce.Categories(1).First())
-            .RuleFor(x => x.Budget, (f) => f.Random.Number(0, 10_000).OrNull(f, .2f))
-            .Generate(count);
+        var faker = new Faker();
+        return faker.Commerce.Categories(count)
+            .Select(c => new Department
+            {
+                Title = c,
+                Budget = faker.Random.Number(0, 10_000).OrNull(faker, .2f),
+                StartDate = faker.Date.Between(new DateTime(DateTime.Today.Year - 10, 1, 1), new DateTime(DateTime.Today.Year, 1, 1))
+            })
+            .ToArray();
     }
 }

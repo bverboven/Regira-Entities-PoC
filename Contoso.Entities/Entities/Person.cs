@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Contoso.Entities;
 
-public class Person : IEntityWithSerial, IHasTitle, IArchivable
+public abstract class Person : IEntityWithSerial, IHasTitle, IArchivable
 {
     public int Id { get; set; }
     [Required][MaxLength(64)] public string GivenName { get; set; } = null!;

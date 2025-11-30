@@ -11,7 +11,7 @@ using Regira.Entities.DependencyInjection.QueryBuilders;
 using Regira.Entities.DependencyInjection.ServiceBuilders.Abstractions;
 using Regira.Entities.DependencyInjection.ServiceBuilders.Extensions;
 using Regira.Entities.EFcore.Primers;
-using Regira.Entities.Mapping.AutoMapper;
+using Regira.Entities.Mapping.Mapster;
 using Regira.Entities.Models;
 using Regira.IO.Storage.FileSystem;
 
@@ -36,13 +36,14 @@ public static class ServiceCollectionExtensions
             {
                 e.UseDefaults();
                 e.ConfigureDefaultJsonOptions();
-                e.UseAutoMapper();
+                //e.UseAutoMapper();
+                e.UseMapsterMapping();
 
                 e.AddDefaultGlobalQueryFilters<Guid>();
-                //e.AddPrimer<HasGuidKeyPrimer>();
                 e.AddPrepper<HasGuidPrepper>();
             })
             .WithAttachments(_ => new BinaryFileService(new FileSystemOptions { RootFolder = AppSettings.DataFolder }))
+            //.WithAttachments(_ => new BinaryBlobService(new AzureCommunicator(new AzureOptions { ConnectionString = "AZURE_CONNECTIONSTRING" })))
             .AddEntities();
 
         return services;
@@ -51,18 +52,14 @@ public static class ServiceCollectionExtensions
     public static IEntityServiceCollection<ContosoContext> AddEntities(this IEntityServiceCollection<ContosoContext> services)
     {
         return services
-            .For<Person>(p =>
+            .For<Student>(entity =>
             {
-                p.AddMapping<PersonDto, PersonInputDto>();
-            })
-            .For<Student>(student =>
-            {
-                student.AddMapping<StudentDto, StudentInputDto>();
-                student.SortBy(query => query
+                entity.UseMapping<StudentDto, StudentInputDto>();
+                entity.SortBy(query => query
                     .OrderBy(x => x.GivenName)
                     .ThenBy(x => x.LastName)
                 );
-                student.Includes((query, incl) =>
+                entity.Includes((query, incl) =>
                 {
                     if (incl?.HasFlag(EntityIncludes.All) == true)
                     {
@@ -73,34 +70,37 @@ public static class ServiceCollectionExtensions
                     return query;
                 });
             })
-            .For<Instructor>(instructor =>
+            .For<Instructor>(entity =>
             {
-                instructor.AddMapping<InstructorDto, InstructorInputDto>();
-                instructor.SortBy(query => query
+                entity.UseMapping<InstructorDto, InstructorInputDto>();
+                entity.AddMapping<OfficeAssignment, OfficeAssignmentDto>();
+
+                entity.SortBy(query => query
                     .OrderBy(x => x.LastName)
                     .ThenBy(x => x.GivenName)
                 );
-                instructor.Includes((query, incl) =>
+                entity.Includes((query, incl) =>
                 {
                     if (incl?.HasFlag(EntityIncludes.All) == true)
                     {
-                        query = query.Include(x => x.Courses!).ThenInclude(x => x.Course);
+                        query = query.Include(x => x.Courses!)
+                            .ThenInclude(x => x.Course);
                         query = query.Include(x => x.OfficeAssignments);
                         query = query.Include(x => x.Attachments!)
                             .ThenInclude(x => x.Attachment);
                     }
                     return query;
                 });
-                instructor.HasAttachments(e => e.Attachments, a =>
+                entity.HasAttachments(e => e.Attachments, a =>
                 {
-                    a.AddMapping<InstructorAttachmentDto, InstructorAttachmentInputDto>();
+                    a.UseMapping<InstructorAttachmentDto, InstructorAttachmentInputDto>();
                 });
             })
-            .For<Department, Guid>(dep =>
+            .For<Department, Guid>(entity =>
             {
-                dep.AddMapping<DepartmentDto, DepartmentInputDto>();
-                dep.SortBy(query => query.OrderBy(x => x.Title));
-                dep.Includes((query, incl) =>
+                entity.UseMapping<DepartmentDto, DepartmentInputDto>();
+                entity.SortBy(query => query.OrderBy(x => x.Title));
+                entity.Includes((query, incl) =>
                 {
                     query = query.Include(d => d.Administrator);
                     if (incl?.HasFlag(EntityIncludes.All) == true)
@@ -110,10 +110,16 @@ public static class ServiceCollectionExtensions
                     return query;
                 });
             })
-            .For<Course, CourseSearchObject, CourseSortBy, CourseIncludes>(course =>
+            .For<Course, CourseSearchObject, CourseSortBy, CourseIncludes>(entity =>
             {
-                course.AddMapping<CourseDto, CourseInputDto>();
-                course.Filter((query, so) =>
+                entity.UseMapping<CourseDto, CourseInputDto>(c =>
+                {
+                    c.Configure<CourseInstructor, CourseInstructorDto>();
+                    c.Configure<CourseInstructorInputDto, CourseInstructor>();
+                    c.Configure<Enrollment, EnrollmentDto>();
+                    c.Configure<EnrollmentInputDto, Enrollment>();
+                });
+                entity.Filter((query, so) =>
                 {
                     // DepartmentId
                     if (so?.DepartmentId?.Any() == true)
@@ -150,7 +156,7 @@ public static class ServiceCollectionExtensions
                     }
                     return query;
                 });
-                course.SortBy((query, sortBy) =>
+                entity.SortBy((query, sortBy) =>
                 {
                     switch (sortBy)
                     {
@@ -170,7 +176,7 @@ public static class ServiceCollectionExtensions
                             return query.OrderBy(x => x.Id);
                     }
                 });
-                course.Includes((query, incl) =>
+                entity.Includes((query, incl) =>
                 {
                     if (incl == null)
                     {
@@ -199,9 +205,9 @@ public static class ServiceCollectionExtensions
                     }
                     return query;
                 });
-                course.Related(e => e.Enrollments);
-                course.Related(e => e.Instructors);
-                course.HasAttachments(e => e.Attachments);
+                entity.Related(e => e.Enrollments);
+                entity.Related(e => e.Instructors);
+                entity.HasAttachments(e => e.Attachments);
             });
     }
 }

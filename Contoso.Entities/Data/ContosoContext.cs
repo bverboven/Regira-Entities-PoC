@@ -7,7 +7,6 @@ namespace Contoso.Data;
 public class ContosoContext(DbContextOptions<ContosoContext> options) : DbContext(options)
 {
     public DbSet<Attachment> Attachments { get; set; }
-    public DbSet<Person> Persons { get; set; }
     public DbSet<Student> Students { get; set; }
     public DbSet<Instructor> Instructors { get; set; }
     public DbSet<Enrollment> Enrollments { get; set; }

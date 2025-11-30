@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <Authors>Regira</Authors>
@@ -11,6 +11,8 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\Regira\Regira-Codebase\src\Entities.DependencyInjection\Entities.DependencyInjection.csproj" />
     <ProjectReference Include="..\..\..\Regira\Regira-Codebase\src\Entities.Mapping.AutoMapper\Entities.Mapping.AutoMapper.csproj" />
+    <ProjectReference Include="..\..\..\Regira\Regira-Codebase\src\Entities.Mapping.Mapster\Entities.Mapping.Mapster.csproj" />
+    <ProjectReference Include="..\..\..\Regira\Regira-Codebase\src\IO.Storage.Azure\IO.Storage.Azure.csproj" />
   </ItemGroup>
 
  </Project>

@@ -1,0 +1,26 @@
+{
+    "api": {
+        "development": "https://localhost:7209/"
+    },
+    "isDebug": true,
+    "isDemo": true,
+    "title": "Regira Entities",
+    "entities": [
+        "Department",
+        "Instructor",
+        "Student",
+        "Course"
+    ],
+    "dashboard": [
+        "departments",
+        "instructors",
+        "students",
+        "courses"
+    ],
+    "navbar": [
+        "departments",
+        "instructors",
+        "students",
+        "courses"
+    ]
+}
